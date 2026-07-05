@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(../.venv/bin/python -c ' *)",
+      "Bash(curl -s http://127.0.0.1:8000/api/crypto)",
+      "Bash(curl -s http://127.0.0.1:8000/api/sentiment)"
+    ]
+  }
+}

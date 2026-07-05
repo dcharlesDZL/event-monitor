@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event Monitor · 数据看板与消息流</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>📊 Event Monitor</h1>
+    <div class="status">
+      <span id="clock"></span>
+      <span id="updated" class="muted"></span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">数据看板</button>
+    <button class="tab" data-tab="feed">消息流</button>
+    <button class="tab" data-tab="sentiment">板块情绪</button>
+    <button class="tab" data-tab="crypto">Crypto 交易</button>
+  </nav>
+
+  <!-- ================= DASHBOARD ================= -->
+  <main id="dashboard" class="panel active">
+    <section>
+      <h2>市场 · 汇率 · 大宗商品 <span class="muted">(Yahoo Finance, 日线)</span></h2>
+      <div id="market-cards" class="cards"></div>
+    </section>
+
+    <section>
+      <h2>搜索指数 <span class="muted">(Google Trends, 近3月)</span></h2>
+      <div id="trends-cards" class="cards"></div>
+      <p id="trends-empty" class="muted hidden">搜索指数暂未拉到（pytrends 可能被限流，稍后自动重试）。</p>
+    </section>
+
+    <section>
+      <h2>宏观经济 <span class="muted">(World Bank, 年度)</span></h2>
+      <div id="macro-table"></div>
+    </section>
+  </main>
+
+  <!-- ================= FEED ================= -->
+  <main id="feed" class="panel">
+    <div class="filters">
+      <div class="filter-group" data-filter="category">
+        <span class="filter-label">类别:</span>
+        <button class="chip active" data-value="">全部</button>
+        <button class="chip" data-value="policy">政策</button>
+        <button class="chip" data-value="tech">科技突破</button>
+        <button class="chip" data-value="breaking">突发</button>
+      </div>
+      <div class="filter-group" data-filter="country">
+        <span class="filter-label">地区:</span>
+        <button class="chip active" data-value="">全部</button>
+        <button class="chip" data-value="CN">中国</button>
+        <button class="chip" data-value="US">美国</button>
+        <button class="chip" data-value="JP">日本</button>
+        <button class="chip" data-value="KR">韩国</button>
+        <button class="chip" data-value="EU">欧盟</button>
+        <button class="chip" data-value="global">全球</button>
+      </div>
+    </div>
+    <div id="news-list" class="news-list"></div>
+  </main>
+
+  <!-- ================= SENTIMENT ================= -->
+  <main id="sentiment" class="panel">
+    <p class="muted note">
+      小红书/抖音无公开接口，情绪分由免费替代指标合成：A股用板块涨跌幅、换手率、
+      涨跌家数与主力资金流；美股用 CNN Fear &amp; Greed 与行业 ETF 的 RSI/动量/量能。
+      情绪过热（≥75）提示卖出，恐慌割肉（≤25）提示买入。仅供参考，不构成投资建议。
+    </p>
+
+    <section>
+      <h2>A股行业板块情绪 <span class="muted">(东方财富, 约30分钟刷新)</span></h2>
+      <div id="cn-sentiment-summary" class="sent-summary"></div>
+      <div id="cn-sentiment-table"></div>
+    </section>
+
+    <section>
+      <h2>美股板块情绪 <span class="muted">(CNN Fear &amp; Greed + 行业 ETF)</span></h2>
+      <div id="us-fng" class="sent-summary"></div>
+      <div id="us-sentiment-table"></div>
+    </section>
+  </main>
+
+  <!-- ================= CRYPTO ================= -->
+  <main id="crypto" class="panel">
+    <div id="crypto-fng" class="sent-summary"></div>
+    <div id="crypto-cards" class="crypto-cards"></div>
+    <p class="muted note">
+      数据源: Binance/OKX（现货K线、永续资金费率、持仓量、多空比）+ Deribit（期权
+      Put/Call 比）。综合信号仅供参考，不构成投资建议；合约交易请严格止损。
+    </p>
+  </main>
+
+  <div id="chart-modal" class="modal hidden">
+    <div class="modal-box">
+      <button id="modal-close" class="modal-close">×</button>
+      <h3 id="modal-title"></h3>
+      <canvas id="modal-chart"></canvas>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "event-monitor",
+      "runtimeExecutable": "./run.sh",
+      "runtimeArgs": [],
+      "port": 8000
+    }
+  ]
+}
