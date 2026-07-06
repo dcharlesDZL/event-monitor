@@ -18,7 +18,9 @@
       "Bash(git push *)",
       "Read(//opt/homebrew/bin/**)",
       "Bash(env)",
-      "Bash(git credential *)"
+      "Bash(git credential *)",
+      "Bash(echo \"pip exit=$?\")",
+      "Bash(git rev-list *)"
     ]
   }
 }

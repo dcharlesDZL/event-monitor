@@ -8,9 +8,9 @@ from __future__ import annotations
 # ---------------------------------------------------------------------------
 # Feature switches
 # ---------------------------------------------------------------------------
-# Master switch for exposing the JSON API endpoints. Disabled by default;
-# set to True to enable the /api/* routes.
-API_ENABLED = False
+# Master switch for exposing the JSON API endpoints.
+# Set to False to disable the /api/* routes (they then return 404).
+API_ENABLED = True
 
 # ---------------------------------------------------------------------------
 # Refresh intervals (seconds)
