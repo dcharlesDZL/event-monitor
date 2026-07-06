@@ -1,5 +1,6 @@
 fastapi==0.110.3
 uvicorn[standard]==0.29.0
+slowapi==0.1.9
 requests==2.31.0
 feedparser==6.0.11
 # optional: 搜索指数（Google Trends）。装不上不影响其它功能。
