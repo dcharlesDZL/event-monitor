@@ -3,7 +3,22 @@
     "allow": [
       "Bash(../.venv/bin/python -c ' *)",
       "Bash(curl -s http://127.0.0.1:8000/api/crypto)",
-      "Bash(curl -s http://127.0.0.1:8000/api/sentiment)"
+      "Bash(curl -s http://127.0.0.1:8000/api/sentiment)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m venv /tmp/em-venv)",
+      "Bash(/tmp/em-venv/bin/pip install *)",
+      "Bash(rm -rf /tmp/em-venv)",
+      "Bash(python3.11 -m venv /tmp/em-venv)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(/tmp/em-venv/bin/python -c ' *)",
+      "Bash(rm -rf /tmp/em-venv; echo \"cleaned\")",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Read(//opt/homebrew/bin/**)",
+      "Bash(env)",
+      "Bash(git credential *)"
     ]
   }
 }
