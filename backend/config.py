@@ -6,6 +6,13 @@ runs out of the box. You can edit the lists below to add/remove sources.
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
+# Feature switches
+# ---------------------------------------------------------------------------
+# Master switch for exposing the JSON API endpoints. Disabled by default;
+# set to True to enable the /api/* routes.
+API_ENABLED = False
+
+# ---------------------------------------------------------------------------
 # Refresh intervals (seconds)
 # ---------------------------------------------------------------------------
 METRICS_REFRESH_SEC = 60 * 30   # market/economic series: every 30 min

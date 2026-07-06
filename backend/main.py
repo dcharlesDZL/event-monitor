@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import os
 
-from fastapi import FastAPI
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
+import config
 import db
 import scheduler
 from collectors import crypto, metrics, sentiment
@@ -16,12 +17,21 @@ FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 app = FastAPI(title="Event Monitor")
 
 
+def _require_api_enabled() -> None:
+    """Guard: block /api/* routes when the API switch is off."""
+    if not config.API_ENABLED:
+        raise HTTPException(status_code=404, detail="API is disabled")
+
+
+api = APIRouter(dependencies=[Depends(_require_api_enabled)])
+
+
 @app.on_event("startup")
 def _startup() -> None:
     scheduler.start()
 
 
-@app.get("/api/metrics")
+@api.get("/api/metrics")
 def api_metrics():
     return {
         "market": metrics.CACHE["market"],
@@ -31,7 +41,7 @@ def api_metrics():
     }
 
 
-@app.get("/api/sentiment")
+@api.get("/api/sentiment")
 def api_sentiment():
     return {
         "cn_sectors": sentiment.CACHE["cn_sectors"],
@@ -41,7 +51,7 @@ def api_sentiment():
     }
 
 
-@app.get("/api/crypto")
+@api.get("/api/crypto")
 def api_crypto():
     return {
         "coins": crypto.CACHE["coins"],
@@ -50,12 +60,12 @@ def api_crypto():
     }
 
 
-@app.get("/api/news")
+@api.get("/api/news")
 def api_news(category: str = "", country: str = "", limit: int = 100):
     return {"items": db.query_news(category, country, min(limit, 300))}
 
 
-@app.get("/api/health")
+@api.get("/api/health")
 def api_health():
     return {
         "ok": True,
@@ -69,4 +79,5 @@ def index():
     return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
 
 
+app.include_router(api)
 app.mount("/", StaticFiles(directory=FRONTEND_DIR), name="static")
