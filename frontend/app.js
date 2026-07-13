@@ -367,6 +367,149 @@ function openCryptoChart(c) {
   });
 }
 
+// ---------------------------------------------------------------- gold
+async function loadGold() {
+  let data;
+  try {
+    data = await (await fetch("/api/gold")).json();
+  } catch (e) { return; }
+  renderGold(data);
+  loadGoldNews();
+}
+
+function goldCard({ label, value, sub, chg, series, onClick }) {
+  const card = document.createElement("div");
+  card.className = "card";
+  const up = (chg ?? 0) >= 0;
+  card.innerHTML = `
+    <div class="name">${label}</div>
+    <div class="value">${value}</div>
+    ${chg != null ? `<div class="change ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${Math.abs(chg)}%</div>` : ""}
+    <div class="asof">${sub || ""}</div>
+    <div class="spark"><canvas></canvas></div>`;
+  if (onClick) card.addEventListener("click", onClick);
+  if (series && series.length) sparkline(card.querySelector("canvas"), series, up);
+  return card;
+}
+
+function renderGold(data) {
+  const obsEl = $("#gold-obs");
+  const obs = data.observations || [];
+  obsEl.innerHTML = obs.length
+    ? obs.map((o) => `<li>${o}</li>`).join("")
+    : '<li class="muted">数据加载中…（首次启动约1分钟）</li>';
+
+  const el = $("#gold-cards");
+  el.innerHTML = "";
+  const g = data.gold;
+  if (g) {
+    const trend = g.price > g.ma30 && g.ma30 > g.ma60 ? "多头排列"
+      : g.price < g.ma30 && g.ma30 < g.ma60 ? "空头排列"
+      : g.price > g.ma30 ? "MA30上方" : "MA30下方";
+    el.appendChild(goldCard({
+      label: "🥇 黄金 (COMEX GC=F)",
+      value: fmtNum(g.price),
+      chg: g.chg,
+      sub: `MA30 ${fmtNum(g.ma30)} · MA60 ${fmtNum(g.ma60)} · ${trend} · ${g.asof}`,
+      series: g.series.dates.map((d, i) => ({ date: d, value: g.series.close[i] })),
+      onClick: () => openGoldChart(g),
+    }));
+  }
+  const dxy = data.dxy;
+  if (dxy) {
+    el.appendChild(goldCard({
+      label: "💵 美元指数 (DXY)",
+      value: fmtNum(dxy.price),
+      chg: dxy.chg,
+      sub: `5日 ${dxy.chg5 >= 0 ? "+" : ""}${dxy.chg5}% · 20日 ${dxy.chg20 >= 0 ? "+" : ""}${dxy.chg20}% · ${dxy.asof}`,
+      series: dxy.series,
+      onClick: () => openChart("美元指数 DXY", dxy.series),
+    }));
+  }
+  const t = data.us10y;
+  if (t) {
+    el.appendChild(goldCard({
+      label: "🏛 美债10年收益率 (%)",
+      value: fmtNum(t.price),
+      chg: t.chg,
+      sub: `5日 ${t.chg5 >= 0 ? "+" : ""}${t.chg5}% · ${t.asof}`,
+      series: t.series,
+      onClick: () => openChart("美债10年收益率", t.series),
+    }));
+  }
+  const c = data.cot;
+  if (c) {
+    el.appendChild(goldCard({
+      label: "📊 COMEX 投机净多头 (手)",
+      value: fmtNum(c.net),
+      chg: null,
+      sub: `周变化 ${c.net_chg >= 0 ? "+" : ""}${fmtNum(c.net_chg)} · 多 ${fmtNum(c.long)} / 空 ${fmtNum(c.short)} · ${c.asof}`,
+      series: c.series,
+      onClick: () => openChart("COMEX 黄金投机净多头 (52周)", c.series),
+    }));
+  }
+  if (!el.children.length) {
+    el.innerHTML = '<p class="muted">黄金数据加载中…</p>';
+  }
+}
+
+function openGoldChart(g) {
+  $("#modal-title").textContent = "黄金 GC=F 日线 · MA30 · MA60";
+  $("#chart-modal").classList.remove("hidden");
+  if (modalChart) modalChart.destroy();
+  const ctx = $("#modal-chart").getContext("2d");
+  const s = g.series;
+  modalChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: s.dates,
+      datasets: [
+        { label: "收盘", data: s.close, borderColor: "#e8c15a", borderWidth: 2,
+          pointRadius: 0, tension: 0.2, fill: true, backgroundColor: "rgba(232,193,90,.08)" },
+        { label: "MA30", data: s.ma30, borderColor: "#4a9eff", borderWidth: 1.5,
+          pointRadius: 0, tension: 0.2 },
+        { label: "MA60", data: s.ma60, borderColor: "#b06ef5", borderWidth: 1.5,
+          pointRadius: 0, tension: 0.2 },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: true, labels: { color: "#8b97a7" } } },
+      scales: {
+        x: { ticks: { color: "#8b97a7", maxTicksLimit: 8 }, grid: { color: "#2c3643" } },
+        y: { ticks: { color: "#8b97a7" }, grid: { color: "#2c3643" } },
+      },
+    },
+  });
+}
+
+async function loadGoldNews() {
+  let data;
+  try {
+    data = await (await fetch("/api/news?category=fed&limit=30")).json();
+  } catch (e) { return; }
+  const el = $("#gold-news");
+  const items = data.items || [];
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">暂无美联储新闻（每 10 分钟刷新）</div>';
+    return;
+  }
+  el.innerHTML = "";
+  items.forEach((n) => {
+    const div = document.createElement("div");
+    div.className = "news-item";
+    div.innerHTML = `
+      <div class="news-badges"><span class="badge fed">美联储</span></div>
+      <div class="news-body">
+        <div class="news-title">
+          <a href="${n.link}" target="_blank" rel="noopener">${n.title}</a>
+        </div>
+        <div class="news-meta">${n.source} · ${timeAgo(n.published || n.fetched)}</div>
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
 // ---------------------------------------------------------------- news feed
 async function loadNews() {
   const qs = new URLSearchParams();
@@ -379,7 +522,7 @@ async function loadNews() {
   renderNews(data.items || []);
 }
 
-const CAT_LABEL = { policy: "政策", tech: "科技", breaking: "突发" };
+const CAT_LABEL = { policy: "政策", tech: "科技", breaking: "突发", fed: "美联储" };
 
 function renderNews(items) {
   const el = $("#news-list");
@@ -421,6 +564,7 @@ function initTabs() {
       // 切换 tab 时立即刷新一次，避免首屏“加载中”停留太久
       if (tab.dataset.tab === "sentiment") loadSentiment();
       if (tab.dataset.tab === "crypto") loadCrypto();
+      if (tab.dataset.tab === "gold") loadGold();
     });
   });
 }
@@ -460,10 +604,12 @@ function init() {
   loadNews();
   loadSentiment();
   loadCrypto();
+  loadGold();
   setInterval(loadMetrics, REFRESH_MS);
   setInterval(loadNews, REFRESH_MS);
   setInterval(loadSentiment, REFRESH_MS * 2);
   setInterval(loadCrypto, REFRESH_MS * 2);
+  setInterval(loadGold, REFRESH_MS * 2);
 }
 
 document.addEventListener("DOMContentLoaded", init);

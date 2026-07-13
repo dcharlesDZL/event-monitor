@@ -21,6 +21,7 @@
     <button class="tab" data-tab="feed">消息流</button>
     <button class="tab" data-tab="sentiment">板块情绪</button>
     <button class="tab" data-tab="crypto">Crypto 交易</button>
+    <button class="tab" data-tab="gold">黄金监控</button>
   </nav>
 
   <!-- ================= DASHBOARD ================= -->
@@ -51,6 +52,7 @@
         <button class="chip" data-value="policy">政策</button>
         <button class="chip" data-value="tech">科技突破</button>
         <button class="chip" data-value="breaking">突发</button>
+        <button class="chip" data-value="fed">美联储</button>
       </div>
       <div class="filter-group" data-filter="country">
         <span class="filter-label">地区:</span>
@@ -94,6 +96,29 @@
     <p class="muted note">
       数据源: Binance/OKX（现货K线、永续资金费率、持仓量、多空比）+ Deribit（期权
       Put/Call 比）。综合信号仅供参考，不构成投资建议；合约交易请严格止损。
+    </p>
+  </main>
+
+  <!-- ================= GOLD ================= -->
+  <main id="gold" class="panel">
+    <section>
+      <h2>综合观察</h2>
+      <ul id="gold-obs" class="gold-obs"></ul>
+    </section>
+
+    <section>
+      <h2>核心指标 <span class="muted">(Yahoo Finance 日线 + CFTC 周度持仓)</span></h2>
+      <div id="gold-cards" class="cards"></div>
+    </section>
+
+    <section>
+      <h2>美联储动态 <span class="muted">(Google News, 加息/降息/利率决议)</span></h2>
+      <div id="gold-news" class="news-list"></div>
+    </section>
+
+    <p class="muted note">
+      数据源: Yahoo Finance（黄金 GC=F、美元指数 DXY、美债10年收益率）+ CFTC 官方
+      COT 报告（COMEX 投机净多头，每周五更新周二数据）。仅供参考，不构成投资建议。
     </p>
   </main>
 

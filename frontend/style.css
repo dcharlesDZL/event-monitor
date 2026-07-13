@@ -128,6 +128,7 @@ section h2 { font-size: 15px; margin: 0 0 14px; font-weight: 600; }
 .badge.policy { background: #2a3f5f; color: #9ec5ff; }
 .badge.tech { background: #2a4f3f; color: #9effc5; }
 .badge.breaking { background: #4f2a2a; color: #ff9e9e; }
+.badge.fed { background: #4a3d1f; color: #e8c15a; }
 .news-body { flex: 1; min-width: 0; }
 .news-title { font-size: 14px; line-height: 1.45; margin-bottom: 4px; }
 .news-title a { color: var(--text); text-decoration: none; }
@@ -176,6 +177,14 @@ section h2 { font-size: 15px; margin: 0 0 14px; font-weight: 600; }
 .sig-sell { background: #4f2a2a; color: #ff9e9e; }
 .sig-buy { background: #2a4f3f; color: #9effc5; }
 .sig-hold { background: var(--panel2); color: var(--muted); }
+
+/* ---------------- gold tab ---------------- */
+.gold-obs {
+  margin: 0; padding: 14px 14px 14px 32px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  font-size: 13px; line-height: 1.9;
+}
+.gold-obs li::marker { color: #e8c15a; }
 
 /* ---------------- crypto tab ---------------- */
 .crypto-cards {

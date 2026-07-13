@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 import config
 import db
 import scheduler
-from collectors import crypto, metrics, sentiment
+from collectors import crypto, gold, metrics, sentiment
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 
@@ -57,6 +57,18 @@ def api_crypto():
         "coins": crypto.CACHE["coins"],
         "fear_greed": crypto.CACHE["fear_greed"],
         "updated": crypto.CACHE["updated"],
+    }
+
+
+@api.get("/api/gold")
+def api_gold():
+    return {
+        "gold": gold.CACHE["gold"],
+        "dxy": gold.CACHE["dxy"],
+        "us10y": gold.CACHE["us10y"],
+        "cot": gold.CACHE["cot"],
+        "observations": gold.CACHE["observations"],
+        "updated": gold.CACHE["updated"],
     }
 
 

@@ -20,6 +20,7 @@ NEWS_REFRESH_SEC = 60 * 10      # news feeds: every 10 min
 TRENDS_REFRESH_SEC = 60 * 60    # google trends: every hour (rate-limit prone)
 SENTIMENT_REFRESH_SEC = 60 * 30  # sector sentiment: every 30 min
 CRYPTO_REFRESH_SEC = 60 * 15     # crypto signals: every 15 min
+GOLD_REFRESH_SEC = 60 * 30       # gold monitor: every 30 min
 
 # ---------------------------------------------------------------------------
 # 1) Market & commodity series via Yahoo Finance (free JSON, no key)
@@ -104,6 +105,12 @@ NEWS_FEEDS = [
     {"category": "tech", "country": "global", "name": "突破技术 (新闻)",
      "url": _gnews("breakthrough OR launches OR unveils AI OR chip OR quantum", "en-US", "US", "US:en")},
 
+    # ---- Fed: 美联储升息降息动态 (黄金监控 tab 使用) ----
+    {"category": "fed", "country": "US", "name": "美联储动态 (EN)",
+     "url": _gnews("Federal Reserve OR FOMC rate decision OR Powell rate cut OR hike", "en-US", "US", "US:en")},
+    {"category": "fed", "country": "US", "name": "美联储动态 (中文)",
+     "url": _gnews("美联储 加息 OR 降息 OR 利率决议 OR 鲍威尔", "zh-CN", "CN", "CN:zh-Hans")},
+
     # ---- Breaking: 紧急/突发新闻 ----
     {"category": "breaking", "country": "global", "name": "Reuters World (新闻)",
      "url": _gnews("breaking news", "en-US", "US", "US:en")},
@@ -147,6 +154,17 @@ CRYPTO_SYMBOLS = [
     {"symbol": "ETH", "name": "以太坊",  "binance": "ETHUSDT", "okx": "ETH-USDT", "deribit": "ETH"},
     {"symbol": "SOL", "name": "Solana", "binance": "SOLUSDT", "okx": "SOL-USDT", "deribit": "SOL"},
 ]
+
+# ---------------------------------------------------------------------------
+# 7) Gold monitor (黄金监控).
+#    价格序列走 Yahoo Finance；COMEX 投机持仓走 CFTC 官方公开 API (每周五发布
+#    的 COT 报告，Socrata 接口免费无 key)；美联储新闻在 NEWS_FEEDS 里的
+#    category="fed"。
+# ---------------------------------------------------------------------------
+GOLD_YAHOO_SYMBOL = "GC=F"        # COMEX 黄金期货
+DXY_YAHOO_SYMBOL = "DX-Y.NYB"     # ICE 美元指数
+US10Y_YAHOO_SYMBOL = "^TNX"       # 美债10年收益率
+CFTC_GOLD_CODE = "088691"         # CFTC 合约代码: GOLD - COMEX
 
 # Keywords that flag a breaking item as "urgent" (for visual highlight).
 URGENT_KEYWORDS = [

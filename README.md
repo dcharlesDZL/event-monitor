@@ -64,6 +64,19 @@ cd backend && uvicorn main:app --port 8000
 
 点卡片可看日线 + MA30/MA60 大图。信号仅供参考,不构成投资建议。
 
+### 黄金监控
+影响黄金的核心变量集中在一屏:
+
+| 模块 | 数据源 | 内容 |
+|------|--------|------|
+| 金价 | Yahoo Finance (GC=F) | 日线 + MA30/MA60 排列判断,点卡片看均线大图 |
+| 美元指数 | Yahoo Finance (DX-Y.NYB) | DXY 现值 + 5/20日变化(美元强弱与金价负相关) |
+| 美债10年收益率 | Yahoo Finance (^TNX) | 利率上行利空黄金 |
+| COMEX 持仓 | CFTC 官方 COT 报告 (免费 API) | 投机(非商业)净多头 52 周序列、周变化、多空持仓;接近 52 周高/低位时给出拥挤度提示 |
+| 美联储动态 | Google News (中英文) | 加息/降息/利率决议/鲍威尔相关新闻,也可在消息流 tab 按「美联储」筛选 |
+
+页面顶部有「综合观察」:均线排列、美元/利率 5 日方向、投机持仓变化的自动解读。
+
 ## 项目结构
 
 ```
@@ -79,7 +92,8 @@ event-monitor/
 │       ├── metrics.py     # Yahoo / World Bank / Google Trends
 │       ├── news.py        # RSS + Federal Register
 │       ├── sentiment.py   # A股/美股板块情绪 (东方财富 / CNN / Yahoo)
-│       └── crypto.py      # BTC/ETH/SOL 信号 (Binance/OKX/Deribit)
+│       ├── crypto.py      # BTC/ETH/SOL 信号 (Binance/OKX/Deribit)
+│       └── gold.py        # 黄金监控 (Yahoo / CFTC COT)
 └── frontend/
     ├── index.html
     ├── style.css
@@ -107,6 +121,7 @@ event-monitor/
 | `GET /api/news?category=&country=&limit=` | 新闻列表,支持筛选 |
 | `GET /api/sentiment` | A股/美股板块情绪分 + CNN Fear & Greed |
 | `GET /api/crypto` | BTC/ETH/SOL 综合信号(技术面+永续+期权) |
+| `GET /api/gold` | 黄金监控(金价均线、DXY、美债收益率、COT 持仓、综合观察) |
 | `GET /api/health` | 健康检查 |
 
 ## 备注
